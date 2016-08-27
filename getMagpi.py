@@ -2,7 +2,10 @@
 __author__ = "f0xd3v1lsw1ld@gmail.com"
 
 # first install beautifulsoup
-# use: sudo pip install beautifulsoup4 
+# use: sudo pip install beautifulsoup4
+# based on:
+# http://automatetheboringstuff.com/chapter11/
+# https://stackoverflow.com/questions/20801034/how-to-measure-download-speed-and-progress-using-requests
 
 import requests, bs4, os, sys, time
 
@@ -10,6 +13,8 @@ url = 'https://www.raspberrypi.org/magpi-issues/'
 
 
 def download(url, file):
+
+    total_length = 0
 
     with open(file, 'wb') as magpiFile:
         start = time.clock()
@@ -26,13 +31,27 @@ def download(url, file):
             magpiFile.write(res.content)
         else:
             for chunk in res.iter_content(1024):
-                download_cnt += len(chunk)
-                magpiFile.write(chunk)
-                done = int(50 * download_cnt / int(total_length))
-                sys.stdout.write("\r[%s%s] %s bps" % ('=' * done, ' ' * (50-done), download_cnt//(time.clock() - start)))
-                sys.stdout.flush()
-
+                if chunk: # filter out keep-alive new chunks
+                    try:
+                        res.raise_for_status()
+                    except Exception as exc:
+                        print('There was a problem: %s' % (exc))
+                        return False
+                    download_cnt += len(chunk)
+                    magpiFile.write(chunk)
+                    done = int(50 * download_cnt / int(total_length))
+                    sys.stdout.write("\r[%s%s] %s bps http status %s" % ('=' * done, ' ' * (50-done), download_cnt//(time.clock() - start),res.status_code))
+                    sys.stdout.flush()
     sys.stdout.write("\n")
+
+    if os.path.isfile(file):
+        if not os.path.getsize(file) == total_length:
+            print('There was a unknown problem downloading: %s' % (file))
+            print('Please try again')
+            os.remove(file)
+
+
+
     return True
 
 def main():
