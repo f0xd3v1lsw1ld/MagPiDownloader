@@ -17,7 +17,6 @@ def download(url, file):
     total_length = 0
 
     with open(file, 'wb') as magpiFile:
-        start = time.clock()
         res = requests.get(url + file, stream=True)
         try:
             res.raise_for_status()
@@ -40,12 +39,15 @@ def download(url, file):
                     download_cnt += len(chunk)
                     magpiFile.write(chunk)
                     done = int(50 * download_cnt / int(total_length))
-                    sys.stdout.write("\r[%s%s] %s bps http status %s" % ('=' * done, ' ' * (50-done), download_cnt//(time.clock() - start),res.status_code))
+                    sys.stdout.write("\r[%s%s] %0.2fMB:%0.2fMB   " %
+                                     ('=' * done, ' ' * (50-done), float(download_cnt)/1000000,
+                                     float(total_length)/1000000
+                                      ))
                     sys.stdout.flush()
     sys.stdout.write("\n")
 
     if os.path.isfile(file):
-        if not os.path.getsize(file) == total_length:
+        if not int(os.path.getsize(file)) == int(total_length):
             print('There was a unknown problem downloading: %s' % (file))
             print('Please try again')
             os.remove(file)
