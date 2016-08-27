@@ -37,7 +37,7 @@ def download(url, file):
 
 def main():
     res = requests.get(url)
-
+    new_files_cnt = 0
     try:
         res.raise_for_status()
     except Exception as exc:
@@ -50,8 +50,11 @@ def main():
         if a['href'][-3:] == 'pdf':
             if not os.path.isfile(a['href']):
                 print("Found new file: %s" % a['href'])
+                new_files_cnt += 1
                 download(url, a['href'])
 
+    if new_files_cnt == 0:
+        print("No new files found")
 
 if __name__ == "__main__":
     main();
