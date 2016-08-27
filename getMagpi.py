@@ -27,6 +27,7 @@ def download(url, file):
         else:
             for chunk in res.iter_content(1024):
                 download_cnt += len(chunk)
+                magpiFile.write(chunk)
                 done = int(50 * download_cnt / int(total_length))
                 sys.stdout.write("\r[%s%s] %s bps" % ('=' * done, ' ' * (50-done), download_cnt//(time.clock() - start)))
                 sys.stdout.flush()
@@ -50,7 +51,6 @@ def main():
             if not os.path.isfile(a['href']):
                 print("Found new file: %s" % a['href'])
                 download(url, a['href'])
-                exit()
 
 
 if __name__ == "__main__":
