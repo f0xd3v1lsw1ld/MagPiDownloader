@@ -52,8 +52,6 @@ def download(url, file):
             print('Please try again')
             os.remove(file)
 
-
-
     return True
 
 def main():
