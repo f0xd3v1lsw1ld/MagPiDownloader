@@ -1,4 +1,4 @@
-# !/usr/bin/python
+#!/usr/bin/python
 __author__ = "f0xd3v1lsw1ld@gmail.com"
 
 # first install beautifulsoup
@@ -17,7 +17,12 @@ def download(url, file):
     total_length = 0
 
     with open(file, 'wb') as magpiFile:
-        res = requests.get(url + file, stream=True)
+        try:
+            res = requests.get(url + file, stream=True)
+        except Exception as exc:
+            print('There was a problem: %s' % (exc))
+            return False
+
         try:
             res.raise_for_status()
         except Exception as exc:
@@ -55,7 +60,12 @@ def download(url, file):
     return True
 
 def main():
-    res = requests.get(url)
+    try:
+        res = requests.get(url)
+    except Exception as exc:
+        print('There was a problem: %s' % (exc))
+        exit()
+    
     new_files_cnt = 0
     try:
         res.raise_for_status()
