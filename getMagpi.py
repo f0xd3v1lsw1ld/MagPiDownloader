@@ -10,7 +10,14 @@ __author__ = "f0xd3v1lsw1ld@gmail.com"
 import requests, bs4, os, sys, time
 
 url = 'https://www.raspberrypi.org/magpi-issues/'
+avaiable_languages = ["French", "Hebrew", "Italian", "Spanish"]
 
+def check_language(url, languages):
+    reti = True
+    for _language in languages:
+        if _language in url:
+            reti = False
+    return reti
 
 def download(url, file):
 
@@ -53,19 +60,26 @@ def download(url, file):
 
     if os.path.isfile(file):
         if not int(os.path.getsize(file)) == int(total_length):
-            print('There was a unknown problem downloading: %s' % (file))
-            print('Please try again')
+            print('There was an unknown problem downloading: %s' % (file))
+            print('Please try it again')
             os.remove(file)
 
     return True
 
 def main():
+    if len(sys.argv) > 1:
+        language = str(sys.argv[1])
+        if language not in avaiable_languages:
+            print("not supported language, please select one of %s" % avaiable_languages)
+            exit()
+        avaiable_languages.remove(language)
+
     try:
         res = requests.get(url)
     except Exception as exc:
         print('There was a problem: %s' % (exc))
         exit()
-    
+
     new_files_cnt = 0
     try:
         res.raise_for_status()
@@ -78,9 +92,10 @@ def main():
     for a in magpiSoup.find_all('a', href=True):
         if a['href'][-3:] == 'pdf':
             if not os.path.isfile(a['href']):
-                print("Found new file: %s" % a['href'])
-                new_files_cnt += 1
-                download(url, a['href'])
+                if check_language(a['href'], avaiable_languages):
+                    print("Found new file: %s" % a['href'])
+                    new_files_cnt += 1
+                    download(url, a['href'])
 
     if new_files_cnt == 0:
         print("No new files found")
