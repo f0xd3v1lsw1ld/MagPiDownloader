@@ -6,11 +6,11 @@ The script sync all MagPi editions (and other pdf documents) from ['https://www.
 Example output:
 ```sh
 # download new file
-./getMagpi.py 
+./getMagpi.py
 > Found new file: Essentials_Bash_v1.pdf
 > [==================================================] 2.35MB:2.35MB  
 # there is no new file
-./getMagpi.py 
+./getMagpi.py
 > No new files found
 ```
 
@@ -38,6 +38,12 @@ go in the MagPi directory and run the script
    $ cd ~/Dokumente/books/MagPi
    $ ./getMagpi.py
    ```
+by default other languages then english are blacklisted
+you can enable these with cli argument, avaible languages are ["French", "Hebrew", "Italian", "Spanish"]
+   ```sh
+   $ ./getMagpi.py French
+   ```
+
 ## Contributing
 
 1. Fork it!
